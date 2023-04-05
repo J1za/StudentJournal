@@ -1,4 +1,4 @@
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Skeleton } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Skeleton, Tooltip } from '@mui/material';
 import { useGetListStudentsQuery, useGetLessonsColumnsQuery, useGetLessonVisitsQuery, useRemovePassStudentMutation, useAddPassStudentMutation } from '@/store/studentJournal/studentJournal.api';
 
 function VisitTable() {
@@ -65,25 +65,31 @@ function VisitTable() {
                                         {Id}
                                     </TableCell>
                                     <TableCell align="center">{FirstName} {SecondName} {LastName}</TableCell>
-                                    {columns?.Items?.map(({ Id: columnId, Title: columnTitle }) => (
-                                        <TableCell
-                                            sx={{
-                                                transition: '.3s',
-                                                "&:hover": {
-                                                    backgroundColor: "#6161db",
-                                                    color: "#fff",
-                                                    fontWeight: 700,
-                                                    transform: 'scale(1.15)'
-                                                }
-                                            }}
-                                            align="center"
-                                            key={columnId}
-                                            style={{ cursor: 'pointer' }}
-                                            onClick={() => handlePassStudent(event, Id, columnId)}
-                                        >
-                                            {visits?.Items?.filter(({ SchoolboyId, ColumnId }) => SchoolboyId === Id && ColumnId === columnId).map(({ Title }) => Title)}
-                                        </TableCell>
-                                    ))}
+                                    {columns?.Items?.map(({ Id: columnId, Title }) => {
+                                        const isVisited = visits?.Items?.some(({ SchoolboyId, ColumnId }) => SchoolboyId === Id && ColumnId === columnId);
+                                        const visitTitle = isVisited ? "Delete" : "Add";
+                                        return (
+                                            <Tooltip title={visitTitle} arrow>
+                                                <TableCell
+                                                    sx={{
+                                                        transition: '.3s',
+                                                        "&:hover": {
+                                                            backgroundColor: "#6161db",
+                                                            color: "#fff",
+                                                            fontWeight: 700,
+                                                            transform: 'scale(1.15)'
+                                                        }
+                                                    }}
+                                                    align="center"
+                                                    key={columnId}
+                                                    style={{ cursor: 'pointer' }}
+                                                    onClick={() => handlePassStudent(event, Id, columnId)}
+                                                >
+                                                    {visits?.Items?.filter(({ SchoolboyId, ColumnId }) => SchoolboyId === Id && ColumnId === columnId).map(({ Title }) => Title)}
+                                                </TableCell>
+                                            </Tooltip>
+                                        );
+                                    })}
                                 </TableRow>
                             ))}
                         </TableBody>
